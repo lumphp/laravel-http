@@ -16,7 +16,7 @@
     "require": {
         "php": "^7.3|^8.0",
         "ext-json": "*",
-        "illuminate/collections": "^8.0",
+        "lumphp/laravel-collections": "^8.0",
         "illuminate/macroable": "^8.0",
         "lumphp/laravel-support": "^8.0",
         "symfony/http-foundation": "^5.1.4",
