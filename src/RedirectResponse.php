@@ -3,7 +3,6 @@
 namespace Illuminate\Http;
 
 use Illuminate\Contracts\Support\MessageProvider;
-use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -12,6 +11,11 @@ use Illuminate\Support\ViewErrorBag;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
+/**
+ * Class RedirectResponse(no session)
+ *
+ * @package Illuminate\Http
+ */
 class RedirectResponse extends BaseRedirectResponse
 {
     use ForwardsCalls, ResponseTrait, Macroable {
@@ -24,31 +28,6 @@ class RedirectResponse extends BaseRedirectResponse
      * @var \Illuminate\Http\Request
      */
     protected $request;
-
-    /**
-     * The session store instance.
-     *
-     * @var \Illuminate\Session\Store
-     */
-    protected $session;
-
-    /**
-     * Flash a piece of data to the session.
-     *
-     * @param  string|array  $key
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function with($key, $value = null)
-    {
-        $key = is_array($key) ? $key : [$key => $value];
-
-        foreach ($key as $k => $v) {
-            $this->session->flash($k, $v);
-        }
-
-        return $this;
-    }
 
     /**
      * Add multiple cookies to the response.
@@ -65,20 +44,7 @@ class RedirectResponse extends BaseRedirectResponse
         return $this;
     }
 
-    /**
-     * Flash an array of input to the session.
-     *
-     * @param  array|null  $input
-     * @return $this
-     */
-    public function withInput(array $input = null)
-    {
-        $this->session->flashInput($this->removeFilesFromInput(
-            ! is_null($input) ? $input : $this->request->input()
-        ));
 
-        return $this;
-    }
 
     /**
      * Remove all uploaded files form the given input array.
@@ -121,29 +87,6 @@ class RedirectResponse extends BaseRedirectResponse
         return $this->withInput($this->request->except(func_get_args()));
     }
 
-    /**
-     * Flash a container of errors to the session.
-     *
-     * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
-     * @param  string  $key
-     * @return $this
-     */
-    public function withErrors($provider, $key = 'default')
-    {
-        $value = $this->parseErrors($provider);
-
-        $errors = $this->session->get('errors', new ViewErrorBag);
-
-        if (! $errors instanceof ViewErrorBag) {
-            $errors = new ViewErrorBag;
-        }
-
-        $this->session->flash(
-            'errors', $errors->put($key, $value)
-        );
-
-        return $this;
-    }
 
     /**
      * Parse the given errors into an appropriate value.
@@ -211,48 +154,5 @@ class RedirectResponse extends BaseRedirectResponse
     public function setRequest(Request $request)
     {
         $this->request = $request;
-    }
-
-    /**
-     * Get the session store instance.
-     *
-     * @return \Illuminate\Session\Store|null
-     */
-    public function getSession()
-    {
-        return $this->session;
-    }
-
-    /**
-     * Set the session store instance.
-     *
-     * @param  \Illuminate\Session\Store  $session
-     * @return void
-     */
-    public function setSession(SessionStore $session)
-    {
-        $this->session = $session;
-    }
-
-    /**
-     * Dynamically bind flash data in the session.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     *
-     * @throws \BadMethodCallException
-     */
-    public function __call($method, $parameters)
-    {
-        if (static::hasMacro($method)) {
-            return $this->macroCall($method, $parameters);
-        }
-
-        if (Str::startsWith($method, 'with')) {
-            return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
-        }
-
-        static::throwBadMethodCallException($method);
     }
 }

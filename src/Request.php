@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
     use Concerns\InteractsWithContentTypes,
-        Concerns\InteractsWithFlashData,
         Concerns\InteractsWithInput,
         Macroable;
 
@@ -404,10 +403,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $request->setJson($from->json());
 
-        if ($session = $from->getSession()) {
-            $request->setLaravelSession($session);
-        }
-
         $request->setUserResolver($from->getUserResolver());
 
         $request->setRouteResolver($from->getRouteResolver());
@@ -468,43 +463,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         return $files;
-    }
-
-    /**
-     * Get the session associated with the request.
-     *
-     * @return \Illuminate\Session\Store
-     *
-     * @throws \RuntimeException
-     */
-    public function session()
-    {
-        if (! $this->hasSession()) {
-            throw new RuntimeException('Session store not set on request.');
-        }
-
-        return $this->session;
-    }
-
-    /**
-     * Get the session associated with the request.
-     *
-     * @return \Illuminate\Session\Store|null
-     */
-    public function getSession()
-    {
-        return $this->session;
-    }
-
-    /**
-     * Set the session instance on the request.
-     *
-     * @param  \Illuminate\Contracts\Session\Session  $session
-     * @return void
-     */
-    public function setLaravelSession($session)
-    {
-        $this->session = $session;
     }
 
     /**

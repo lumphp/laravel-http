@@ -1,6 +1,6 @@
 {
     "name": "lumphp/laravel-http",
-    "description": "The Illuminate Http package.",
+    "description": "The Illuminate Http package.(no session)",
     "license": "MIT",
     "homepage": "https://laravel.com",
     "support": {
@@ -18,7 +18,6 @@
         "ext-json": "*",
         "illuminate/collections": "^8.0",
         "illuminate/macroable": "^8.0",
-        "illuminate/session": "^8.0",
         "lumphp/laravel-support": "^8.0",
         "symfony/http-foundation": "^5.1.4",
         "symfony/http-kernel": "^5.1.4",
@@ -26,7 +25,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Illuminate\\Http\\": ""
+            "Illuminate\\Http\\": "src/"
         }
     },
     "suggest": {
