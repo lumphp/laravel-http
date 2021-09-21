@@ -1,11 +1,11 @@
 {
     "name": "lumphp/laravel-http",
-    "description": "The Illuminate Http package.(no session)",
+    "description": "The Illuminate Http package.",
     "license": "MIT",
     "homepage": "https://laravel.com",
     "support": {
-        "issues": "https://github.com/lumphp/laravel-http/issues",
-        "source": "https://github.com/lumphp/laravel-http"
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
     },
     "authors": [
         {
@@ -17,7 +17,8 @@
         "php": "^7.3|^8.0",
         "ext-json": "*",
         "lumphp/laravel-collections": "^8.0",
-        "illuminate/macroable": "^8.0",
+        "lumphp/laravel-macroable": "^8.0",
+        "lumphp/laravel-session": "^8.0",
         "lumphp/laravel-support": "^8.0",
         "symfony/http-foundation": "^5.1.4",
         "symfony/http-kernel": "^5.1.4",

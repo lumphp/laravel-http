@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
     use Concerns\InteractsWithContentTypes,
+        Concerns\InteractsWithFlashData,
         Concerns\InteractsWithInput,
         Macroable;
 
@@ -130,6 +131,23 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         return count($this->query()) > 0
             ? $this->url().$question.Arr::query(array_merge($this->query(), $query))
             : $this->fullUrl().$question.Arr::query($query);
+    }
+
+    /**
+     * Get the full URL for the request without the given query string parameters.
+     *
+     * @param  array|string  $query
+     * @return string
+     */
+    public function fullUrlWithoutQuery($keys)
+    {
+        $query = Arr::except($this->query(), $keys);
+
+        $question = $this->getBaseUrl().$this->getPathInfo() === '/' ? '/?' : '?';
+
+        return count($query) > 0
+            ? $this->url().$question.Arr::query($query)
+            : $this->url();
     }
 
     /**
@@ -403,6 +421,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $request->setJson($from->json());
 
+        if ($session = $from->getSession()) {
+            $request->setLaravelSession($session);
+        }
+
         $request->setUserResolver($from->getUserResolver());
 
         $request->setRouteResolver($from->getRouteResolver());
@@ -463,6 +485,43 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         return $files;
+    }
+
+    /**
+     * Get the session associated with the request.
+     *
+     * @return \Illuminate\Session\Store
+     *
+     * @throws \RuntimeException
+     */
+    public function session()
+    {
+        if (! $this->hasSession()) {
+            throw new RuntimeException('Session store not set on request.');
+        }
+
+        return $this->session;
+    }
+
+    /**
+     * Get the session associated with the request.
+     *
+     * @return \Illuminate\Session\Store|null
+     */
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+    /**
+     * Set the session instance on the request.
+     *
+     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @return void
+     */
+    public function setLaravelSession($session)
+    {
+        $this->session = $session;
     }
 
     /**
@@ -592,6 +651,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  string  $offset
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return Arr::has(
@@ -606,6 +666,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  string  $offset
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->__get($offset);
@@ -618,6 +679,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  mixed  $value
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->getInputSource()->set($offset, $value);
@@ -629,6 +691,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  string  $offset
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $this->getInputSource()->remove($offset);
